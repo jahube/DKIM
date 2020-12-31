@@ -29,12 +29,12 @@ If (($DKIM1) -and ($DKIM1 -ne $Selector1)) { Write-host "   [ INCORRECT ]" -F cy
 Write-host "`n`n     CNAME Selector 2" -F yellow  ; Write-host "-----------------------------------" -F green
 Write-host "[Host name 2] " -F white -NoNewline ; Write-host "  $Host2" -F yellow -NoNewline ; Write-host $Domain -F green
 Write-host "[Points To  ]  " -F white -NoNewline
-Write-host " selector1-" -F yellow -NoNewline ; Write-host "$Value" -F cyan -NoNewline
+Write-host " selector2-" -F yellow -NoNewline ; Write-host "$Value" -F cyan -NoNewline
 Write-host "._domainkey." -F yellow -NoNewline ; Write-host $tenant -F green
  
 If (!($DKIM2)) { Write-host "DKIM Missing - Please add`n-------------------------`n$hostname2`n$Selector2" -F yellow }
 If ($DKIM2) {Write-host "[Existing DKIM CNAME ]  " -F green -NoNewline ; Write-host "$DKIM2" -F yellow -NoNewline }
 If ($DKIM2 -eq $Selector2) { Write-host "   [ OK ]" -F green -NoNewline }
-If ($key2) { Write-host "  [ DKIM KEY 1 Active ]" -F green -NoNewline }
+If ($key2) { Write-host "  [ DKIM KEY 2 Active ]" -F green -NoNewline }
 If (!($key1 -or $key2)) { Write-host "  [ PLEASE Activate DKIM ]" -F yellow -NoNewline }
 If (($DKIM2) -and ($DKIM2 -ne $Selector2)) { Write-host "   [ INCORRECT ]" -F cyan -NoNewline }
