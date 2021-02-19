@@ -4,37 +4,26 @@ $Domain = "yourdomain.com"  # Modify
 
 $tenant = "YourTenant.onmicrosoft.com" # Modify
 
-$host1 = "Selector1._domainkey." ; $host2 = "Selector2._domainkey."
-$Value = $Domain -replace "\.","-" ; $hostname1 =  $host1 + $domain; $hostname2 =  $host2 + $domain
-$Selector1 = "selector1-" + $Value + "._domainkey." + $tenant
-$Selector2 = "selector2-" + $Value + "._domainkey." + $tenant
-$DKIM1 = (Resolve-DnsName "$hostname1" CNAME -DnsOnly -EA SilentlyContinue).namehost
-$DKIM2 = (Resolve-DnsName "$hostname2" CNAME -DnsOnly -EA SilentlyContinue).namehost
-$key1 = (Resolve-DnsName "$Selector1" txt -EA SilentlyContinue).strings 
-$key2 = (Resolve-DnsName "$Selector2" txt -EA SilentlyContinue).strings 
+$MX2 = (Resolve-DnsName "$Domain" MX -DnsOnly -EA SilentlyContinue).NameExchange
+$s = "Selector" ;$d = "._domainkey." ; $MX1 = $MX2 -replace ".mail.protection.outlook.com"
+$H1=$($s+'1'+$d);$DKIM1 = (Resolve-DnsName $($H1+$domain) CNAME -DnsOnly -EA SilentlyContinue).namehost
+$H2=$($s+'2'+$d);$DKIM2 = (Resolve-DnsName $($H2+$domain) CNAME -DnsOnly -EA SilentlyContinue).namehost
+$s1 = $($s+'1-'+$MX1+$d+$tenant) ; $key1 = (Resolve-DnsName $s1 txt -EA SilentlyContinue).strings
+$s2 = $($s+'2-'+$MX1+$d+$tenant) ; $key2 = (Resolve-DnsName $s2 txt -EA SilentlyContinue).strings
+$t1 = $("`n`n,CNAME Selector ,[Host name],[REQUIRED CNAME],DKIM Missing - Please add`n,`n-------------------------`n").Split(",")
+$t2 = $("[Existing CNAME],[OK],[DKIM KEY Active],[PLEASE Activate DKIM],[INCORRECT]").Split(",")
+Write-host $t1[0]$t1[1]"1" -F yellow  ; Write-host $("-" * 35) -F green ; Write-host $t1[2]"1" -F white -N
+Write-host "  $H1" -F yellow -N ; Write-host $Domain -F green ; Write-host $t1[3] -F white -N ;
+Write-host $s"1-" -F yellow -N ; Write-host $MX1 -F cyan -N ;Write-host $d -F yellow -N ; Write-host $tenant -F green
+If (!($DKIM1)) { Write-host $t1[5]$t1[6]$h1"`n"$S1 -F yellow } ;If ($DKIM1) {Write-host $t2[0] -F green -N ; 
+Write-host $DKIM1 -F yellow -N } ; If ($DKIM1 -eq $S1) { Write-host $t2[1] -F green -N };
+If ($key1) { Write-host $t2[2] -F green -N };If (!($key1 -or $key2)) { Write-host $t2[3] -F yellow -N };
+If (($DKIM1) -and ($DKIM1 -ne $S1)) { Write-host $t2[4] -F cyan -N };
 
-Write-host "`n`n     CNAME Selector 1" -F yellow  ; Write-host "-----------------------------------" -F green
-Write-host "[Host name 1] " -F white -NoNewline ; Write-host "  $Host1" -F yellow -NoNewline ; Write-host $Domain -F green
-Write-host "[Points To  ]  " -F white -NoNewline
-Write-host " selector1-" -F yellow -NoNewline ; Write-host "$Value" -F cyan -NoNewline
-Write-host "._domainkey." -F yellow -NoNewline ; Write-host $tenant -F green
-
-If (!($DKIM1)) { Write-host "DKIM Missing - Please add`n-------------------------`n$hostname1`n$Selector1" -F yellow }
-If ($DKIM1) {Write-host "[Existing DKIM CNAME ]  " -F green -NoNewline ; Write-host "$DKIM1" -F yellow -NoNewline }
-If ($DKIM1 -eq $Selector1) { Write-host "   [ OK ]" -F green -NoNewline }
-If ($key1) { Write-host "  [ DKIM KEY 1 Active ]" -F green -NoNewline }
-If (!($key1 -or $key2)) { Write-host "  [ PLEASE Activate DKIM ]" -F yellow -NoNewline }
-If (($DKIM1) -and ($DKIM1 -ne $Selector1)) { Write-host "   [ INCORRECT ]" -F cyan -NoNewline }
-
-Write-host "`n`n     CNAME Selector 2" -F yellow  ; Write-host "-----------------------------------" -F green
-Write-host "[Host name 2] " -F white -NoNewline ; Write-host "  $Host2" -F yellow -NoNewline ; Write-host $Domain -F green
-Write-host "[Points To  ]  " -F white -NoNewline
-Write-host " selector2-" -F yellow -NoNewline ; Write-host "$Value" -F cyan -NoNewline
-Write-host "._domainkey." -F yellow -NoNewline ; Write-host $tenant -F green
- 
-If (!($DKIM2)) { Write-host "DKIM Missing - Please add`n-------------------------`n$hostname2`n$Selector2" -F yellow }
-If ($DKIM2) {Write-host "[Existing DKIM CNAME ]  " -F green -NoNewline ; Write-host "$DKIM2" -F yellow -NoNewline }
-If ($DKIM2 -eq $Selector2) { Write-host "   [ OK ]" -F green -NoNewline }
-If ($key2) { Write-host "  [ DKIM KEY 2 Active ]" -F green -NoNewline }
-If (!($key1 -or $key2)) { Write-host "  [ PLEASE Activate DKIM ]" -F yellow -NoNewline }
-If (($DKIM2) -and ($DKIM2 -ne $Selector2)) { Write-host "   [ INCORRECT ]" -F cyan -NoNewline }
+Write-host $t1[0]$t1[1]"2" -F yellow  ; Write-host $("-" * 35) -F green ; Write-host $t1[2]"2" -F white -N
+Write-host "  $H2" -F yellow -N ; Write-host $Domain -F green ; Write-host $t1[3] -F white -N ;
+Write-host $s"2-" -F yellow -N ; Write-host $MX1 -F cyan -N ;Write-host $d -F yellow -N ; Write-host $tenant -F green
+If (!($DKIM2)) { Write-host $t1[5]$t1[6]$h2"`n"$S2 -F yellow } ;If ($DKIM2) {Write-host $t2[0] -F green -N ; 
+Write-host $DKIM2 -F yellow -N } ; If ($DKIM2 -eq $S2) { Write-host $t2[1] -F green -N };
+If ($key2) { Write-host $t2[2] -F green -N };If (!($key1 -or $key2)) { Write-host $t2[3] -F yellow -N };
+If (($DKIM2) -and ($DKIM1 -ne $S2)) { Write-host $t2[4] -F cyan -N };
