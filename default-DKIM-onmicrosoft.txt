@@ -1,0 +1,12 @@
+* when disabled onmicrosoft default DKIM is used
+
+Use DKIM to validate outbound email sent from your custom domain article:
+https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/use-dkim-to-validate-outbound-email
+
+"If you do not enable DKIM, Microsoft 365 automatically creates a 
+1024-bit DKIM public key for your default domain and the associated 
+private key which we store internally in our datacenter. 
+By default, Microsoft 365 uses a default signing configuration for 
+domains that do not have a policy in place.
+This means that if you do not set up DKIM yourself, Microsoft 365 will 
+use its default policy and keys it creates to enable DKIM for your domain."
